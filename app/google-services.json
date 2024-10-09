@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "707392180152",
+    "project_id": "prepxpertori",
+    "storage_bucket": "prepxpertori.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707392180152:android:1cdf9ce2e05e6020ba094d",
+        "android_client_info": {
+          "package_name": "com.example.prepxpert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSfUYfMGGprHfTubz6lISWu_QhI8scDHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

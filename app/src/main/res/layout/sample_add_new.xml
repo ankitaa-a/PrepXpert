@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:id="@+id/sampleaddnew"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addnewintbox"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/addnewinterviewshape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:background="@drawable/gradient_bg2"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add New Interview"
+                android:textColor="@color/black"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                android:paddingTop="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Job Role"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/jobrole"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Enter Job Role/Position"
+                android:textColor="@color/black"
+                android:paddingLeft="10dp"
+                android:background="@drawable/logineditbox"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Job Description"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/jobdesc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Enter Job Description"
+                android:paddingLeft="10dp"
+                android:textColor="@color/black"
+                android:background="@drawable/logineditbox"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Years of Experience"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/yrsofexp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:paddingLeft="10dp"
+                android:inputType="number"
+                android:textColor="@color/black"
+                android:hint="Enter Years of Experience"
+                android:background="@drawable/logineditbox"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/generatebtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/white_button"
+                    android:text="Generate"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
