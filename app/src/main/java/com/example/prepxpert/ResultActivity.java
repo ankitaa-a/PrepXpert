@@ -2,12 +2,15 @@ package com.example.prepxpert;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -25,14 +28,17 @@ import java.util.List;
 import java.util.Map;
 
 public class ResultActivity extends AppCompatActivity {
-    String ques1, ques2, ques3, ques4, ques5, userans1, userans4, userans2, userans3, userans5;
-    int rat1, rat2, rat3, rat4, rat5;
+    String ques1, ques2, ques3, ques4, ques5, userans1="", userans4="", userans2="", userans3="", userans5="";
+    int rat1=-1, rat2=-1, rat3=-1, rat4=-1, rat5=-1;
     String ans2,ans1,ans3,ans4,ans5;
-    String feed1, feed2, feed3, feed4, feed5;
+    String feed1="", feed2="", feed3="", feed4="", feed5="";
     String user,userid;
+    private Context context;
+    TextView ratingtext;
     List<String> groupList;
     List<String> childList;
     Map<String,List<String>> resultList;
+    TextView toptext;
     ExpandableListAdapter expandableListAdapter;
     ExpandableListView expandableListView;
     Map<String, List<String>> mobileCollection;
@@ -41,6 +47,9 @@ public class ResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+
+        toptext=findViewById(R.id.toptext);
+        ratingtext=findViewById(R.id.ratingtext);
 
         Intent intent = getIntent();
         user = intent.getStringExtra("username");
@@ -52,6 +61,13 @@ public class ResultActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    if (!snapshot.child(user).child(userid).child("userans1").exists() ||
+                            !snapshot.child(user).child(userid).child("feed1").exists() ||
+                            !snapshot.child(user).child(userid).child("rat1").exists()) {
+                        startActivity(new Intent(ResultActivity.this,NoResultActivity.class));
+                        finish();
+                    }
+
                     ques1 = snapshot.child(user).child(userid).child("que1").getValue(String.class);
                     ques2 = snapshot.child(user).child(userid).child("que2").getValue(String.class);
                     ques3 = snapshot.child(user).child(userid).child("que3").getValue(String.class);
@@ -63,6 +79,7 @@ public class ResultActivity extends AppCompatActivity {
                     ans3 = snapshot.child(user).child(userid).child("ans3").getValue(String.class);
                     ans4 = snapshot.child(user).child(userid).child("ans4").getValue(String.class);
                     ans5 = snapshot.child(user).child(userid).child("ans5").getValue(String.class);
+
 
                     userans1 = snapshot.child(user).child(userid).child("userans1").getValue(String.class);
                     userans2 = snapshot.child(user).child(userid).child("userans2").getValue(String.class);
@@ -82,22 +99,20 @@ public class ResultActivity extends AppCompatActivity {
                     rat4 = snapshot.child(user).child(userid).child("rat4").getValue(Integer.class);
                     rat5 = snapshot.child(user).child(userid).child("rat5").getValue(Integer.class);
 
+                    if(rat1!=-1 && rat2!=-1 &&rat3!=-1 && rat4!=-1 && rat5!=-1){
+                        double res=((rat1+rat2+rat3+rat4+rat5)/5.0)*2;
+                        double res2=Math.round(res*100.0)/100.0;
+                        ratingtext.setText("Your Overall Rating: "+Double.toString(res2));
+                    }
+
+
                     createGroupList();
                     createCollection();
 
                     expandableListView=findViewById(R.id.expandableListView);
                     expandableListAdapter=new MyExpandableListAdapter(ResultActivity.this,groupList,resultList);
                     expandableListView.setAdapter(expandableListAdapter);
-        /*expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            int lastExpandedPosition=-1;
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                if(lastExpandedPosition!=-1 && groupPosition!=lastExpandedPosition){
-                    expandableListView.collapseGroup(lastExpandedPosition);
-                }
-                lastExpandedPosition=groupPosition;
-            }
-        });*/
+
                     expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                         @Override
                         public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
@@ -107,6 +122,10 @@ public class ResultActivity extends AppCompatActivity {
                         }
                     });
 
+
+                }
+                else {
+                    Toast.makeText(ResultActivity.this, "No data available", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
@@ -115,6 +134,8 @@ public class ResultActivity extends AppCompatActivity {
                 System.out.println("Error occured in showing result");
             }
         });
+
+
 
 
     }

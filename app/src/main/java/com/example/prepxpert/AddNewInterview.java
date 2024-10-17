@@ -1,14 +1,19 @@
 package com.example.prepxpert;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
@@ -19,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AddNewInterview extends AppCompatActivity {
+
+    String[] permission={"android.permission.CAMERA","android.permission.RECORD_AUDIO"};
     TextView newrole,newdesc,newyrs,newuser;
     String ans1="",ans2="",ans3="",ans4="",ans5="";
     String que1="",que2="",que3="",que4="",que5="";
@@ -46,6 +53,8 @@ public class AddNewInterview extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar = findViewById(R.id.progressBar);
 
+        startintbtn.setBackgroundColor(getResources().getColor(R.color.grey));
+        startintbtn.setTextColor(getResources().getColor(R.color.darkgrey));
         startintbtn.setEnabled(false);  // Disable the button initially
 
         Intent intent=getIntent();
@@ -78,6 +87,11 @@ public class AddNewInterview extends AppCompatActivity {
                 chatModel=getChatModel();
 
                 geminiResp(query1);*/
+
+                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    requestPermissions(permission,80);
+                }*/
+
                 Intent intent=new Intent(AddNewInterview.this,QuestionSection.class);
                 intent.putExtra("userid",userid);
                 intent.putExtra("username",user);
@@ -146,9 +160,12 @@ public class AddNewInterview extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     // Enable the submit button after successful data storage
                                     progressBar.setVisibility(View.GONE);
+                                    startintbtn.setBackground(ContextCompat.getDrawable(AddNewInterview.this, R.drawable.beginint_button));;
+                                    startintbtn.setTextColor(getResources().getColor(R.color.white));
                                     startintbtn.setEnabled(true);
                                 } else {
                                     progressBar.setVisibility(View.GONE);
+                                    Toast.makeText(AddNewInterview.this, "Unable to Generate Questions. Please try again later !!", Toast.LENGTH_SHORT).show();
                                     // Handle any errors
                                 }
                             });
@@ -166,4 +183,24 @@ public class AddNewInterview extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==80){
+            if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                startintbtn.setEnabled(true);
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(AddNewInterview.this,QuestionSection.class);
+                intent.putExtra("userid",userid);
+                intent.putExtra("username",user);
+                startActivity(intent);
+            }
+            else{
+                startintbtn.setEnabled(false);
+
+            }
+        }
+    }
+
 }

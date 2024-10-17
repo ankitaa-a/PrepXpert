@@ -34,10 +34,11 @@
                 android:layout_height="50dp"
                 android:id="@+id/login_username"
                 android:layout_marginTop="40dp"
-                android:drawableLeft="@drawable/baseline_person_24"
+                android:drawableLeft="@drawable/baseline_mail_24"
                 android:padding="8dp"
+
                 android:background="@drawable/logineditbox"
-                android:hint="Username"
+                android:hint="Email"
                 android:textColor="@color/black"
                 android:drawablePadding="8dp"/>
 

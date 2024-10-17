@@ -39,7 +39,7 @@ public class DashboardActivity extends AppCompatActivity {
     private String usernamefromlogin;
     SharedPreferences sharedPreferences;
     private static final String SHARED_PREF_NAME="mypref";
-    private static final String KEY_USERNAME="username";
+    private static final String KEY_EMAIL="email";
     private static final String KEY_NAME="name";
     private RecyclerView recyclerView;
     private InterviewAdapter interviewAdapter;
@@ -58,11 +58,11 @@ public class DashboardActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
 
-        String usernamefromlogin = sharedPreferences.getString(KEY_USERNAME, null);
+        String usernamefromlogin = sharedPreferences.getString(KEY_EMAIL, null).replace(".","_");
         String name = sharedPreferences.getString(KEY_NAME, null);
 
-        if (usernamefromlogin != null) {
-            usernameTextView.setText("Welcome Back " + usernamefromlogin);
+        if (name != null) {
+            usernameTextView.setText("Welcome Back " + name);
         } else {
             usernameTextView.setText("Welcome Back");
         }

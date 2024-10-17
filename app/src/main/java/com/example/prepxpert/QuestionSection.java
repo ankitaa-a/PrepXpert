@@ -1,9 +1,11 @@
 package com.example.prepxpert;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -42,6 +44,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.ExecutionException;
 public class QuestionSection extends AppCompatActivity {
+
+    int startcam=0;
+
+    String[] permission={"android.permission.CAMERA","android.permission.RECORD_AUDIO"};
     private PreviewView previewView;
     String answer1="",ans2="",ans3="",ans4="",ans5="";
     String question1="",que2="",que3="",que4="",que5="";
@@ -56,6 +62,7 @@ public class QuestionSection extends AppCompatActivity {
     private SpeechRecognizer speechRecognizer;
     private boolean isRecording = false;
     private DatabaseReference database;
+    static final int REQUEST_CODE=123;
     private static final int RECORD_AUDIO_REQUEST_CODE = 101,CAMERA_REQUEST_CODE=100;  // or any unique integer
 
 
@@ -69,7 +76,11 @@ public class QuestionSection extends AppCompatActivity {
         user=intent.getStringExtra("username");
         userid=intent.getStringExtra("userid");
 
-        checkPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(permission,80);
+        }
+
+        //checkPermission();
 
         quesdef1=findViewById(R.id.quesdef1);
         //prevbtn=findViewById(R.id.prevbtn);
@@ -104,17 +115,16 @@ public class QuestionSection extends AppCompatActivity {
 
         //quesdef1.setText(question1);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+
+        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
         } else {
             startCamera();
-        }
+        }*/
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_REQUEST_CODE);
-        }
+
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -140,19 +150,41 @@ public class QuestionSection extends AppCompatActivity {
         });*/
 
         recordbtn.setOnClickListener(v -> {
-            if (isRecording) {
-                // Stop recording
-                speechRecognizer.stopListening();
-                isRecording = false;
-                recordbtn.setImageResource(R.drawable.microphone);
 
-            } else {
-                // Start recording
-                speechRecognizer.startListening(speechIntent);
-                isRecording = true;
-                recordbtn.setImageResource(R.drawable.stop);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_REQUEST_CODE);
 
+            }else {
+                    if (isRecording) {
+                        // Stop recording
+                        speechRecognizer.stopListening();
+                        isRecording = false;
+                        recordbtn.setImageResource(R.drawable.microphone);
+
+                    } else {
+                        // Start recording
+                        speechRecognizer.startListening(speechIntent);
+                        isRecording = true;
+                        recordbtn.setImageResource(R.drawable.stop);
+
+                    }
             }
+
+
+                /*if (isRecording) {
+                    // Stop recording
+                    speechRecognizer.stopListening();
+                    isRecording = false;
+                    recordbtn.setImageResource(R.drawable.microphone);
+
+                } else {
+                    // Start recording
+                    speechRecognizer.startListening(speechIntent);
+                    isRecording = true;
+                    recordbtn.setImageResource(R.drawable.stop);
+
+                }*/
+
         });
 
 
@@ -248,16 +280,46 @@ public class QuestionSection extends AppCompatActivity {
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
-                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-                finish();
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) + ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(QuestionSection.this, Manifest.permission.CAMERA)
+                && ActivityCompat.shouldShowRequestPermissionRationale(QuestionSection.this, Manifest.permission.RECORD_AUDIO)){
+
+                    Toast.makeText(this, "Required per", Toast.LENGTH_SHORT).show();
+
+                    /*AlertDialog.Builder builder=new AlertDialog.Builder(QuestionSection.this);
+
+                    builder.setTitle("Permissions Required !!");
+                    builder.setMessage("Kindly grant CAMERA and MICROPHONE permissions in order to proceed further.");
+                    builder.setPositiveButton("GRANT", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(QuestionSection.this,
+                                    new String[]{
+                                            Manifest.permission.CAMERA,
+                                            Manifest.permission.RECORD_AUDIO
+                                    },REQUEST_CODE);
+                        }
+                    });
+
+                    builder.setNegativeButton("CANCEL",null);
+
+                    AlertDialog alertDialog=builder.create();
+                    alertDialog.show();*/
+                }
+                else{
+                    ActivityCompat.requestPermissions(QuestionSection.this,
+                            new String[]{
+                                    Manifest.permission.CAMERA,
+                                    Manifest.permission.RECORD_AUDIO
+                            },REQUEST_CODE);
+                }
+            }else {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);  // Call the superclass implementation
 
@@ -344,6 +406,41 @@ public class QuestionSection extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==80){
+            if(grantResults[0]== PackageManager.PERMISSION_GRANTED && grantResults[1]== PackageManager.PERMISSION_GRANTED){
+                if(startcam==0){
+                    startCamera();
+                    startcam=1;
+                }
 
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
 
+            }
+            else{
+                showPermissionDeniedDialog();
+                Toast.makeText(this, "Permission Not Granted", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
+    private void showPermissionDeniedDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Permission Required")
+                .setMessage("This app requires Camera and Audio Recording permissions to function. Please enable them in Settings.")
+                .setPositiveButton("Go to Settings", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();  // Optionally, close the activity if permission is essential
+                })
+                .create()
+                .show();
+    }
 }
