@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.prepxpert.data.MyDbHandler;
+import com.example.prepxpert.model.Sqljobdetails;
+import com.example.prepxpert.params.Params;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,7 +48,8 @@ public class DashboardActivity extends AppCompatActivity {
     private static final String KEY_NAME="name";
     private RecyclerView recyclerView;
     private InterviewAdapter interviewAdapter;
-    private List<JobDetails> interviewList;
+    //private List<JobDetails> interviewList;
+    private List<Sqljobdetails> interviewList;
 
 
     @Override
@@ -66,8 +72,16 @@ public class DashboardActivity extends AppCompatActivity {
         } else {
             usernameTextView.setText("Welcome Back");
         }
-
+        String sampleemail = sharedPreferences.getString(KEY_EMAIL, null);
         interviewList = new ArrayList<>();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        interviewAdapter = new InterviewAdapter(interviewList);
+        recyclerView.setAdapter(interviewAdapter);
+        sqlfetchPreviousInterviews(usernamefromlogin);
+        Toast.makeText(this, "Number of interviews: " + interviewList.size(), Toast.LENGTH_SHORT).show();
+
+
+        /*interviewList = new ArrayList<>();
         interviewAdapter = new InterviewAdapter(interviewList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(interviewAdapter);
@@ -75,7 +89,7 @@ public class DashboardActivity extends AppCompatActivity {
         databaseRef = FirebaseDatabase.getInstance().getReference("jobdetails").child(usernamefromlogin);
 
         // Fetch previous interviews
-        fetchPreviousInterviews(usernamefromlogin);
+        fetchPreviousInterviews(usernamefromlogin);*/
 
         //if you want to get data from the previous activity
         /*Intent intent=getIntent();
@@ -164,10 +178,21 @@ public class DashboardActivity extends AppCompatActivity {
                 String interviewId = reference.child(usernamelogin).push().getKey();
                 long createdDate = System.currentTimeMillis();
 
-                JobDetails jobDetails = new JobDetails(usernamelogin, jobrole, jobdesc, yrofexp,createdDate,interviewId);
+                MyDbHandler db=new MyDbHandler(DashboardActivity.this);
+
+                //JobDetails jobDetails = new JobDetails(usernamelogin, jobrole, jobdesc, yrofexp,createdDate,interviewId);
+                Sqljobdetails sqljobdetails=new Sqljobdetails();
+                sqljobdetails.setId(interviewId);
+                sqljobdetails.setJobrole(jobrole);
+                sqljobdetails.setJobdesc(jobdesc);
+                sqljobdetails.setEmail(usernamelogin);
+                sqljobdetails.setYrsofexp(yrofexp);
+                sqljobdetails.setCreatedDate(createdDate);
+
+                db.adddetails(sqljobdetails);
 
                 // Store interview under the unique key
-                reference.child(usernamelogin).child(interviewId).setValue(jobDetails);
+                //reference.child(usernamelogin).child(interviewId).setValue(jobDetails);
 
                 //JobDetails jobDetails=new JobDetails(usernamelogin,jobrole,jobdesc,yrofexp);
                 //reference.child(usernamelogin).setValue(jobDetails);
@@ -192,7 +217,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     }
 
-    private void fetchPreviousInterviews(String username) {
+    /*private void fetchPreviousInterviews(String username) {
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -209,6 +234,46 @@ public class DashboardActivity extends AppCompatActivity {
                 Toast.makeText(DashboardActivity.this, "Failed to load interviews", Toast.LENGTH_SHORT).show();
             }
         });
+    }*/
+
+    // Method to fetch previous interviews where the email matches
+    private void sqlfetchPreviousInterviews(String email) {
+        MyDbHandler myDbHandler = new MyDbHandler(this);
+        SQLiteDatabase db = myDbHandler.getReadableDatabase();
+        interviewList.clear(); // Clear the list before adding new data
+
+        Cursor cursor = db.query(
+                Params.TABLE_NAME, // Table name
+                null, // Retrieve all columns
+                "email = ?", // WHERE clause
+                new String[]{email}, // Arguments for WHERE clause
+                null, // Group by
+                null, // Having
+                null // Order by
+        );
+
+        // Check if there are any results and add them to the list
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Assuming JobDetails class has a constructor or setter methods to set values
+                Sqljobdetails jobDetails = new Sqljobdetails();
+                jobDetails.setId(cursor.getString(cursor.getColumnIndexOrThrow("id")));
+                jobDetails.setJobrole(cursor.getString(cursor.getColumnIndexOrThrow("jobrole")));
+                jobDetails.setJobdesc(cursor.getString(cursor.getColumnIndexOrThrow("jobdesc")));
+                jobDetails.setYrsofexp(cursor.getInt(cursor.getColumnIndexOrThrow("yrsexp")));
+                jobDetails.setCreatedDate(cursor.getLong(cursor.getColumnIndexOrThrow("createddate")));
+                // Add other fields as needed
+
+                interviewList.add(jobDetails);
+            } while (cursor.moveToNext());
+            cursor.close();
+        } else {
+            Toast.makeText(this, "No interviews found for this email", Toast.LENGTH_SHORT).show();
+        }
+
+        // Notify the adapter that data has changed
+        interviewAdapter.notifyDataSetChanged();
     }
+
 
 }

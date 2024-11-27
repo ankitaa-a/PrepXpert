@@ -3,7 +3,6 @@ package com.example.prepxpert;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,10 +17,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.Manifest;
+
+import com.example.prepxpert.data.MyDbHandler;
 import com.google.ai.client.generativeai.java.ChatFutures;
-import com.google.ai.client.generativeai.java.GenerativeModelFutures;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
 import android.widget.Toast;
@@ -32,11 +31,6 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.ExecutionException;
 public class QuestionSection4 extends AppCompatActivity {
@@ -78,7 +72,18 @@ public class QuestionSection4 extends AppCompatActivity {
         submitbtn=findViewById(R.id.submitansbtn4);
         previewView = findViewById(R.id.previewView4);
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
+        MyDbHandler dbHelper = new MyDbHandler(this);
+        String ques1 = dbHelper.getDatabyId(userid,"ques4");
+
+        if (ques1 != null) {
+            //Toast.makeText(this, "Question 1: " + ques1, Toast.LENGTH_SHORT).show();
+            quesdef4.setText(ques1);
+        } else {
+            quesdef4.setText("Not found");
+            Toast.makeText(this, "No question found for this user ID", Toast.LENGTH_SHORT).show();
+        }
+
+        /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
         //Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -94,7 +99,7 @@ public class QuestionSection4 extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {

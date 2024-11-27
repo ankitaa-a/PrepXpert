@@ -15,6 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.prepxpert.data.MyDbHandler;
+import com.example.prepxpert.model.Sqljobdetails;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.firebase.database.DatabaseReference;
@@ -115,6 +117,7 @@ public class AddNewInterview extends AppCompatActivity {
         GeminiResp.getResponse(chatModel, query, new ResponseCallback() {
             @Override
             public void onResponse(String response) {
+                Toast.makeText(AddNewInterview.this, "Inside gemini", Toast.LENGTH_SHORT).show();
                 String jsonString = response.replace("```json","").replace("```","");
 
                 JSONObject jsonObject= null;
@@ -150,7 +153,24 @@ public class AddNewInterview extends AppCompatActivity {
                     ans5=jsonObject.getString("answer5");
                     System.out.println(ans5);
 
-                    JobDetails jobDetails = new JobDetails(user, role, desc, yrs,date,userid);
+                    MyDbHandler dbHelper = new MyDbHandler(AddNewInterview.this);
+                    int rowsAffected = dbHelper.updateJobDetails(userid, ans1, ans2, ans3, ans4, ans5,que1, que2, que3, que4, que5);
+
+                    if (rowsAffected > 0) {
+                        Toast.makeText(AddNewInterview.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        startintbtn.setBackground(ContextCompat.getDrawable(AddNewInterview.this, R.drawable.beginint_button));;
+                        startintbtn.setTextColor(getResources().getColor(R.color.white));
+                        startintbtn.setEnabled(true);
+                    } else {
+                        Toast.makeText(AddNewInterview.this, "Update failed", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(AddNewInterview.this, "Unable to Generate Questions. Please try again later !!", Toast.LENGTH_SHORT).show();
+                        // Handle any errors
+                    }
+
+
+                    /*JobDetails jobDetails = new JobDetails(user, role, desc, yrs,date,userid);
                     jobDetails.JobQues(que1, que2, que3, que4, que5);
                     jobDetails.JobAns(ans1, ans2, ans3, ans4, ans5);
 
@@ -168,17 +188,19 @@ public class AddNewInterview extends AppCompatActivity {
                                     Toast.makeText(AddNewInterview.this, "Unable to Generate Questions. Please try again later !!", Toast.LENGTH_SHORT).show();
                                     // Handle any errors
                                 }
-                            });
+                            });*/
 
                     //sample.setText(ques);
                 } catch (JSONException e) {
                     progressBar.setVisibility(View.GONE);
+                    Toast.makeText(AddNewInterview.this, "inside catch", Toast.LENGTH_SHORT).show();
                     throw new RuntimeException(e);
                 }
             }
             @Override
             public void onError(Throwable throwable) {
                 progressBar.setVisibility(View.GONE);
+                Toast.makeText(AddNewInterview.this, "inside onerror", Toast.LENGTH_SHORT).show();
                 //quesdef1.setText("Unable to Generate Questions!! Try Again");
             }
         });

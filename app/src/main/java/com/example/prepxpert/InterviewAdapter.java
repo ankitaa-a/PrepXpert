@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.prepxpert.model.Sqljobdetails;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +18,10 @@ import java.util.Locale;
 
 public class InterviewAdapter extends RecyclerView.Adapter<InterviewAdapter.ViewHolder> {
 
-    private List<JobDetails> interviewList;
+    //private List<JobDetails> interviewList;
+    private List<Sqljobdetails> interviewList;
 
-    public InterviewAdapter(List<JobDetails> interviewList) {
+    public InterviewAdapter(List<Sqljobdetails> interviewList) {
         this.interviewList = interviewList;
     }
 
@@ -30,7 +34,16 @@ public class InterviewAdapter extends RecyclerView.Adapter<InterviewAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        JobDetails jobDetails = interviewList.get(position);
+        Sqljobdetails jobDetails = interviewList.get(position);
+        holder.jobRole.setText(jobDetails.getJobrole());
+        holder.jobDesc.setText(jobDetails.getJobdesc());
+        holder.yearsExp.setText("Experience(yrs): " + String.valueOf(jobDetails.getYrsofexp()));
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String dateString = sdf.format(new Date(jobDetails.getCreatedDate()));
+        holder.createdDate.setText(dateString);
+        /*JobDetails jobDetails = interviewList.get(position);
         holder.jobRole.setText(jobDetails.getJobrole());
         holder.jobDesc.setText(jobDetails.getJobdesc());
         holder.yearsExp.setText("Experience(yrs): "+String.valueOf(jobDetails.getYrsofexp()));
@@ -38,13 +51,13 @@ public class InterviewAdapter extends RecyclerView.Adapter<InterviewAdapter.View
         // Convert timestamp to a readable date format
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dateString = sdf.format(new Date(jobDetails.getCreatedDate()));
-        holder.createdDate.setText(dateString);  // Set the created date
+        holder.createdDate.setText(dateString);*/  // Set the created date
 
         // Handle Start Interview button click
         holder.startInterviewButton.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), QuestionSection.class);
             intent.putExtra("username", jobDetails.getUsername()); // Pass username only
-            intent.putExtra("userid", jobDetails.getInterviewid());     // Pass userid only
+            intent.putExtra("userid", jobDetails.getId());     // Pass userid only
             holder.itemView.getContext().startActivity(intent);
         });
 
@@ -52,7 +65,7 @@ public class InterviewAdapter extends RecyclerView.Adapter<InterviewAdapter.View
         holder.seeResultsButton.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ResultActivity.class);
             intent.putExtra("username", jobDetails.getUsername()); // Pass username only
-            intent.putExtra("userid", jobDetails.getInterviewid());     // Pass userid only
+            intent.putExtra("userid", jobDetails.getId());     // Pass userid only
             holder.itemView.getContext().startActivity(intent);
         });
     }

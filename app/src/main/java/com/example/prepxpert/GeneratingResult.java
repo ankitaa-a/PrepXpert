@@ -8,16 +8,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.prepxpert.data.MyDbHandler;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +49,21 @@ public class GeneratingResult extends AppCompatActivity {
         gentext=findViewById(R.id.gentext);
         progressBar.setVisibility(View.VISIBLE);
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
+        MyDbHandler dbHelper = new MyDbHandler(this);
+        ques1 = dbHelper.getDatabyId(userid,"ques1");
+        ques2 = dbHelper.getDatabyId(userid,"ques2");
+        ques3 = dbHelper.getDatabyId(userid,"ques3");
+        ques4 = dbHelper.getDatabyId(userid,"ques4");
+        ques5 = dbHelper.getDatabyId(userid,"ques5");
+        userans1 = dbHelper.getDatabyId(userid,"userans1");
+        userans2 = dbHelper.getDatabyId(userid,"userans2");
+        userans3 = dbHelper.getDatabyId(userid,"userans3");
+        userans4 = dbHelper.getDatabyId(userid,"userans4");
+        userans5 = dbHelper.getDatabyId(userid,"userans5");
+
+        processFeedbackAndRatings();
+
+        /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -76,7 +89,7 @@ public class GeneratingResult extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 // Handle database error
             }
-        });
+        });*/
     }
 
     private void processFeedbackAndRatings() {
@@ -118,7 +131,7 @@ public class GeneratingResult extends AppCompatActivity {
         });
     }
 
-    private void saveFeedbackAndRating(int count, String feedback, int rating) {
+    /*private void saveFeedbackAndRating(int count, String feedback, int rating) {
         DatabaseReference userAnswersRef = FirebaseDatabase.getInstance().getReference("jobdetails")
                 .child(user)
                 .child(userid);
@@ -126,28 +139,78 @@ public class GeneratingResult extends AppCompatActivity {
         Map<String, Object> userAnswersUpdates = new HashMap<>();
         switch (count) {
             case 1:
-                userAnswersUpdates.put("feed1", feedback);
-                userAnswersUpdates.put("rat1", rating);
+                MyDbHandler dbHelper = new MyDbHandler(GeneratingResult.this);
+                int rowsAffected = dbHelper.updateFeedRat(userid, feedback,"feed1",rating,"rat1");
+
+                if (rowsAffected > 0) {
+                    Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+                //userAnswersUpdates.put("feed1", feedback);
+                //userAnswersUpdates.put("rat1", rating);
                 gentext.setText("Generating Rating");
                 break;
             case 2:
-                userAnswersUpdates.put("feed2", feedback);
-                userAnswersUpdates.put("rat2", rating);
+                MyDbHandler dbHelper2 = new MyDbHandler(GeneratingResult.this);
+                int rowsAffected2 = dbHelper2.updateFeedRat(userid, feedback,"feed2",rating,"rat2");
+
+                if (rowsAffected2 > 0) {
+                    Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+                //userAnswersUpdates.put("feed2", feedback);
+                //userAnswersUpdates.put("rat2", rating);
                 gentext.setText("Generating Feedback");
                 break;
             case 3:
-                userAnswersUpdates.put("feed3", feedback);
-                userAnswersUpdates.put("rat3", rating);
+                MyDbHandler dbHelper3 = new MyDbHandler(GeneratingResult.this);
+                int rowsAffected3 = dbHelper3.updateFeedRat(userid, feedback,"feed3",rating,"rat3");
+
+                if (rowsAffected3 > 0) {
+                    Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+                //userAnswersUpdates.put("feed3", feedback);
+                //userAnswersUpdates.put("rat3", rating);
                 gentext.setText("Processing..");
                 break;
             case 4:
-                userAnswersUpdates.put("feed4", feedback);
-                userAnswersUpdates.put("rat4", rating);
+                MyDbHandler dbHelper4 = new MyDbHandler(GeneratingResult.this);
+                int rowsAffected4 = dbHelper4.updateFeedRat(userid, feedback,"feed4",rating,"rat4");
+
+                if (rowsAffected4 > 0) {
+                    Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+                //userAnswersUpdates.put("feed4", feedback);
+                //userAnswersUpdates.put("rat4", rating);
                 gentext.setText("Loading..");
                 break;
             case 5:
-                userAnswersUpdates.put("feed5", feedback);
-                userAnswersUpdates.put("rat5", rating);
+                MyDbHandler dbHelper5 = new MyDbHandler(GeneratingResult.this);
+                int rowsAffected5 = dbHelper5.updateFeedRat(userid, feedback,"feed5",rating,"rat5");
+
+                if (rowsAffected5 > 0) {
+                    Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+                //userAnswersUpdates.put("feed5", feedback);
+                //userAnswersUpdates.put("rat5", rating);
                 gentext.setText("Almost there...");
                 changeActivity();
                 break;
@@ -190,7 +253,7 @@ public class GeneratingResult extends AppCompatActivity {
                         System.out.println("Failed to update user answers: " + e.getMessage());
                     }
                 });
-    }
+    }*/
 
     public void changeActivity(){
         Intent intent=new Intent(GeneratingResult.this,ResultActivity.class);
@@ -198,5 +261,58 @@ public class GeneratingResult extends AppCompatActivity {
         intent.putExtra("username",user);
         startActivity(intent);
         finish();
+    }
+
+    private void saveFeedbackAndRating(int count, String feedback, int rating) {
+        MyDbHandler dbHelper = new MyDbHandler(GeneratingResult.this);
+        int rowsAffected = 0;
+
+        switch (count) {
+            case 1:
+                rowsAffected = dbHelper.updateFeedRat(userid, feedback, "feed1", rating, "rat1");
+                gentext.setText("Generating Rating");
+                break;
+            case 2:
+                rowsAffected = dbHelper.updateFeedRat(userid, feedback, "feed2", rating, "rat2");
+                gentext.setText("Generating Feedback");
+                break;
+            case 3:
+                rowsAffected = dbHelper.updateFeedRat(userid, feedback, "feed3", rating, "rat3");
+                gentext.setText("Processing..");
+                break;
+            case 4:
+                rowsAffected = dbHelper.updateFeedRat(userid, feedback, "feed4", rating, "rat4");
+                gentext.setText("Loading..");
+                break;
+            case 5:
+                rowsAffected = dbHelper.updateFeedRat(userid, feedback, "feed5", rating, "rat5");
+                gentext.setText("Almost there...");
+                changeActivity();
+                break;
+        }
+
+        if (rowsAffected > 0) {
+            Toast.makeText(GeneratingResult.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+            if (count < 5) {
+                switch (count) {
+                    case 1:
+                        geminiResp(2, "question: " + ques2 + ", UserAnswer: " + userans2 + textques);
+                        break;
+                    case 2:
+                        geminiResp(3, "question: " + ques3 + ", UserAnswer: " + userans3 + textques);
+                        break;
+                    case 3:
+                        geminiResp(4, "question: " + ques4 + ", UserAnswer: " + userans4 + textques);
+                        break;
+                    case 4:
+                        geminiResp(5, "question: " + ques5 + ", UserAnswer: " + userans5 + textques);
+                        break;
+                }
+            } else {
+                progressBar.setVisibility(View.GONE);
+            }
+        } else {
+            Toast.makeText(GeneratingResult.this, "Update failed", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.example.prepxpert;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,12 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.Manifest;
+
+import com.example.prepxpert.data.MyDbHandler;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -33,16 +33,8 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 public class QuestionSection5 extends AppCompatActivity {
     private PreviewView previewView;
@@ -83,7 +75,18 @@ public class QuestionSection5 extends AppCompatActivity {
         submitbtn=findViewById(R.id.submitansbtn5);
         previewView = findViewById(R.id.previewView5);
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
+        MyDbHandler dbHelper = new MyDbHandler(this);
+        String ques1 = dbHelper.getDatabyId(userid,"ques5");
+
+        if (ques1 != null) {
+            //Toast.makeText(this, "Question 1: " + ques1, Toast.LENGTH_SHORT).show();
+            quesdef5.setText(ques1);
+        } else {
+            quesdef5.setText("Not found");
+            Toast.makeText(this, "No question found for this user ID", Toast.LENGTH_SHORT).show();
+        }
+
+        /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
         //Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,7 +102,7 @@ public class QuestionSection5 extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -227,8 +230,19 @@ public class QuestionSection5 extends AppCompatActivity {
                     Toast.makeText(QuestionSection5.this, "Unable to save Answer", Toast.LENGTH_SHORT).show();
                 }
 
+                MyDbHandler dbHelper = new MyDbHandler(QuestionSection5.this);
+                int rowsAffected = dbHelper.updateUserAns(userid, userans1, userans2, userans3, userans4, userans5);
+
+                if (rowsAffected > 0) {
+                    Toast.makeText(QuestionSection5.this, "Details updated successfully", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(QuestionSection5.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    // Handle any errors
+                }
+
                 // Reference to the interview for a specific user
-                DatabaseReference userAnswersRef = FirebaseDatabase.getInstance().getReference("jobdetails")
+                /*DatabaseReference userAnswersRef = FirebaseDatabase.getInstance().getReference("jobdetails")
                         .child(user)  // Replace with the actual user ID
                         .child(userid);   // Replace with the actual interview ID
 
@@ -254,7 +268,7 @@ public class QuestionSection5 extends AppCompatActivity {
                                 // Failed to update
                                 System.out.println("Failed to update user answers: " + e.getMessage());
                             }
-                        });
+                        });*/
 
             }
         });

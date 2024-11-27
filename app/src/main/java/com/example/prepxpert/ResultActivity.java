@@ -1,8 +1,6 @@
 package com.example.prepxpert;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,14 +11,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.prepxpert.data.MyDbHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +46,62 @@ public class ResultActivity extends AppCompatActivity {
         user = intent.getStringExtra("username");
         userid = intent.getStringExtra("userid");
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
+        MyDbHandler dbHelper = new MyDbHandler(this);
+        ques1 = dbHelper.getDatabyId(userid,"ques1");
+        ques2 = dbHelper.getDatabyId(userid,"ques2");
+        ques3 = dbHelper.getDatabyId(userid,"ques3");
+        ques4 = dbHelper.getDatabyId(userid,"ques4");
+        ques5 = dbHelper.getDatabyId(userid,"ques5");
+
+        ans1 = dbHelper.getDatabyId(userid,"ans1");
+        ans2 = dbHelper.getDatabyId(userid,"ans2");
+        ans3 = dbHelper.getDatabyId(userid,"ans3");
+        ans4 = dbHelper.getDatabyId(userid,"ans4");
+        ans5 = dbHelper.getDatabyId(userid,"ans5");
+
+        userans1 = dbHelper.getDatabyId(userid,"userans1");
+        userans2 = dbHelper.getDatabyId(userid,"userans2");
+        userans3 = dbHelper.getDatabyId(userid,"userans3");
+        userans4 = dbHelper.getDatabyId(userid,"userans4");
+        userans5 = dbHelper.getDatabyId(userid,"userans5");
+
+        feed1 = dbHelper.getDatabyId(userid,"feed1");
+        feed2 = dbHelper.getDatabyId(userid,"feed2");
+        feed3 = dbHelper.getDatabyId(userid,"feed3");
+        feed4 = dbHelper.getDatabyId(userid,"feed4");
+        feed5 = dbHelper.getDatabyId(userid,"feed5");
+
+        rat1 = dbHelper.getRatById(userid,"rat1");
+        rat2 = dbHelper.getRatById(userid,"rat2");
+        rat3 = dbHelper.getRatById(userid,"rat3");
+        rat4 = dbHelper.getRatById(userid,"rat4");
+        rat5 = dbHelper.getRatById(userid,"rat5");
+
+
+        if(rat1!=-1 && rat2!=-1 &&rat3!=-1 && rat4!=-1 && rat5!=-1){
+            double res=((rat1+rat2+rat3+rat4+rat5)/5.0)*2;
+            double res2=Math.round(res*100.0)/100.0;
+            ratingtext.setText("Your Overall Rating: "+Double.toString(res2));
+        }
+
+
+        createGroupList();
+        createCollection();
+
+        expandableListView=findViewById(R.id.expandableListView);
+        expandableListAdapter=new MyExpandableListAdapter(ResultActivity.this,groupList,resultList);
+        expandableListView.setAdapter(expandableListAdapter);
+
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                String selected=expandableListAdapter.getChild(groupPosition,childPosition).toString();
+                Toast.makeText(ResultActivity.this, "selected: "+selected, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference("jobdetails");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -133,7 +179,7 @@ public class ResultActivity extends AppCompatActivity {
                 // Handle database error
                 System.out.println("Error occured in showing result");
             }
-        });
+        });*/
 
 
 
